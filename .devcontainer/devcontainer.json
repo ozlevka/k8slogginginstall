@@ -1,0 +1,34 @@
+{
+	"name": "Python Sample",
+	"dockerFile": "Dockerfile",
+
+	// Specifies a list of ports that should be published from the container.
+	"appPort": [9000],
+
+	// Comment out the next line to run as root instead. Linux users, 
+	// update Dockerfile with your user's UID/GID if not 1000.
+	"runArgs": ["-u", "vscode", 
+		"-v", "/home/ozlevka/.kube/:/home/vscode/.kube/",
+		"-v", "/home/ozlevka/.aws/:/home/vscode/.aws/"],
+
+	// Use 'settings' to set *default* container specific settings.json values on container create. 
+	// You can edit these settings after create using File > Preferences > Settings > Remote.
+	"settings": { 
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"python.pythonPath": "/usr/local/bin/python",
+		"python.linting.pylintEnabled": true,
+		"python.linting.pylintPath": "/usr/local/bin/pylint",
+		"python.linting.enabled": true
+	},
+
+	// Specifies a command to run after the container is created
+	"postCreateCommand": "sudo pip install -r requirements.txt",
+
+	"extensions": [
+        "ms-python.python",
+        "vscoss.vscode-ansible",
+        "mauve.terraform",
+		"ms-kubernetes-tools.vscode-kubernetes-tools",
+		"eriklynd.json-tools"
+	]
+}

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: test-app
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: imb-app
+  template:
+    metadata:
+      labels:
+        app: imb-app
+    spec:
+      containers:
+      - name: test-app
+        image: ozlevka/test-imb-app:version-1

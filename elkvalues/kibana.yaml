@@ -1,0 +1,5 @@
+service:
+  type: LoadBalancer
+  httpPort: 5601
+  nodePort: null
+  port: 5601

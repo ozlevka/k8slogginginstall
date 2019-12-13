@@ -1,0 +1,59 @@
+- hosts: localhost
+  gather_facts: false
+  vars:
+    test: 1
+  tasks:
+  - name: clone ELK repo
+    git:
+      repo: https://github.com/elastic/helm-charts.git
+      dest: ~/elk/repo
+      update: yes
+  
+  - name: install elasticsearch
+    shell: |
+     #!/bin/bash
+     kubectl apply -f ../elkvalues/persistence.yaml
+     helm upgrade --install elasticsearch ~/elk/repo/elasticsearch -f ../elkvalues/elasticsearch.yaml
+  
+  - name: wait elasticsearch be ready
+    shell: |
+      #!/bin/bash
+      kubectl get pods -l app=elasticsearch-master | grep Running | grep -c '1/1'
+    register: elastic_ready
+    delay: 10
+    retries: 20
+    until: elastic_ready.stdout|int == 1
+
+  - name: install kibana
+    shell: |
+      #!/bin/bash
+      helm upgrade --install kibana ~/elk/repo/kibana -f ../elkvalues/kibana.yaml
+  
+  - name: filebeat installation
+    shell: |
+      #!/bin/bash
+      helm upgrade --install filebeat ~/elk/repo/filebeat -f ../elkvalues/filebeat.yaml
+  
+
+  - name: wait kibana be ready
+    shell: |
+      #!/bin/bash
+      kubectl get pods -l app=kibana | grep Running | grep -c '1/1'
+    register: kibana_ready
+    delay: 10
+    retries: 20
+    until: kibana_ready.stdout|int == 1
+  
+  - name: wait kibana service load balancer be ready
+    shell: |
+      #!/bin/bash
+      kubectl get service kibana-kibana | grep -c 'amazonaws.com'
+    register: kibana_service
+    delay: 10
+    retries: 20
+    until: kibana_service.stdout|int == 1
+  
+  - name: deploy logs application
+    shell: |
+      #!/bin/bash
+      kubectl apply -f ../application/deployment.yaml

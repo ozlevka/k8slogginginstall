@@ -1,0 +1,4 @@
+replicas: 1
+minimumMasterNodes: 1
+volumeClaimTemplate:
+  storageClassName: imubit-pv

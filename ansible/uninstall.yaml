@@ -1,0 +1,10 @@
+- hosts: localhost
+  tasks:
+  - name: helm delete all
+    shell: |
+      helm delete --purge kibana
+      helm delete --purge elasticsearch
+      helm delete --purge filebeat
+      kubectl delete pvc $(kubectl get pvc | tail -1 | awk '{print $1}')
+      kubectl delete -f ../elkvalues/persistence.yaml
+      kubectl delete -f ../application/deployment.yaml 
